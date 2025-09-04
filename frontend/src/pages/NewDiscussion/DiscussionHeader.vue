@@ -21,8 +21,8 @@
           { label: 'Discard', condition: () => !draftDoc?.doc, onClick: discard },
           {
             label: 'Save Draft',
-            condition: () => isDraftChanged && !savingDraft,
-            onClick: saveDraft,
+            condition: () => isDraftChanged && !saveStatus.isSaving,
+            onClick: immediateSave,
           },
         ]"
         placement="right"
@@ -54,10 +54,10 @@ const {
   author,
   deleteDraft,
   discard,
-  saveDraft,
-  savingDraft,
+  saveStatus,
   isDraftChanged,
   publish,
   publishing,
+  immediateSave,
 } = useNewDiscussionContext()
 </script>

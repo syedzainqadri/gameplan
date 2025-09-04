@@ -7,7 +7,6 @@ from frappe.model.naming import append_number_if_name_exists
 from pypika.terms import ExistsCriterion
 
 import gameplan
-from gameplan.gemoji import get_random_gemoji
 from gameplan.mixins.archivable import Archivable
 
 
@@ -49,17 +48,6 @@ class GPTeam(Archivable, Document):
 		if not self.name:
 			slug = frappe.scrub(self.title).replace("_", "-")
 			self.name = append_number_if_name_exists("GP Team", slug)
-
-		if not self.icon:
-			self.icon = get_random_gemoji().emoji
-
-		if not self.readme:
-			self.readme = f"""<h3>Welcome to the {self.title} team page!</h3>
-			<p>You can add a brief introduction about the team, important links, resources,
-			and other important information here.</p>
-			"""
-
-		self.add_member(frappe.session.user)
 
 	def add_member(self, email):
 		if email not in [member.user for member in self.members]:

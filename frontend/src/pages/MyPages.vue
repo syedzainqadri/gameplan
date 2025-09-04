@@ -35,7 +35,7 @@
       </Button>
     </div>
   </header>
-  <div class="mx-auto w-full max-w- px-5">
+  <div class="mx-auto w-full px-5">
     <div class="py-6">
       <PageGrid
         class="grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"

@@ -8,7 +8,7 @@
       Add new
     </Button>
   </header>
-  <div class="mx-auto max-w-4xl pt-5 sm:px-5">
+  <div class="mx-auto max-w-4xl pt-5 sm:px-5 pb-40">
     <LastPostReminder class="px-3 mb-3" />
 
     <div class="overflow-x-auto flex gap-2 px-3 py-1 mb-3 items-center">
@@ -23,15 +23,12 @@
         <Select class="pr-7 shrink-0 min-w-28" :options="orderOptions" v-model="orderBy" />
       </div>
     </div>
-    <div v-if="currentFeedType == 'drafts'">
-      <DraftDiscussions />
-    </div>
-    <KeepAlive v-else>
+    <KeepAlive>
       <DiscussionList
         ref="discussionListRef"
         routeName="ProjectDiscussion"
         :filters="filters"
-        :orderBy="orderBy"
+        :orderBy="() => orderBy"
         :cacheKey="`HomeDiscussions-${currentFeedType}`"
         :key="JSON.stringify(filters)"
       />
@@ -45,10 +42,9 @@ import { Breadcrumbs, Select, TabButtons, usePageMeta } from 'frappe-ui'
 import type { OrderBy } from 'frappe-ui/src/data-fetching/useList/types'
 import DiscussionList from '@/components/DiscussionList.vue'
 import LastPostReminder from '@/components/LastPostReminder.vue'
-import DraftDiscussions from '@/components/DraftDiscussions.vue'
 import { useRouter } from 'vue-router'
 
-type FeedType = 'following' | 'participating' | 'recent' | 'bookmarks' | 'drafts' | 'unread'
+type FeedType = 'following' | 'participating' | 'recent' | 'bookmarks' | 'unread'
 
 interface Props {
   feedType?: FeedType
@@ -94,10 +90,6 @@ const feedOptions = [
     label: 'Bookmarks',
     value: 'bookmarks',
   },
-  {
-    label: 'Drafts',
-    value: 'drafts',
-  },
 ]
 
 const orderOptions = [
@@ -107,11 +99,15 @@ const orderOptions = [
     disabled: true,
   },
   {
-    label: 'Last post',
+    label: 'Newest first',
     value: 'last_post_at desc' as OrderBy,
   },
   {
-    label: 'Created',
+    label: 'Oldest first',
+    value: 'last_post_at asc' as OrderBy,
+  },
+  {
+    label: 'Creation date',
     value: 'creation desc' as OrderBy,
   },
 ]

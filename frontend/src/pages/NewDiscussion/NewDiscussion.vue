@@ -2,7 +2,7 @@
   <TextEditor
     ref="textEditorRef"
     class="pb-40"
-    editor-class="max-w-[unset] min-h-[calc(100vh-350px)] prose-sm overflow-auto"
+    editor-class="max-w-[unset] min-h-[calc(100vh-350px)] prose-sm overflow-auto px-2 -mx-2"
     :content="draftData.content"
     @change="(content: string) => (draftData.content = content)"
     :editable="author.name === sessionUser.name"
@@ -12,15 +12,10 @@
       <DiscussionHeader />
 
       <div class="mx-auto max-w-3xl px-4 xl:px-0 isolate">
-        <div class="top-12 z-10" :class="[showFixedMenu ? 'sticky' : ' static']">
+        <div class="top-12 z-10 sticky">
           <div class="bg-surface-white">
             <div class="flex items-center -ml-2 pt-2 pb-1">
-              <div
-                :class="[
-                  showFixedMenu ? 'opacity-100' : 'opacity-0',
-                  'hidden sm:flex transition-opacity duration-100',
-                ]"
-              >
+              <div class="hidden sm:flex transition-opacity duration-100">
                 <TextEditorFixedMenu :buttons="true" />
               </div>
             </div>
@@ -48,8 +43,7 @@ import { provideNewDiscussion } from './useNewDiscussion'
 
 const textEditorRef = useTemplateRef<InstanceType<typeof TextEditor>>('textEditorRef')
 
-const { draftData, sessionUser, author, showFixedMenu, initialize } =
-  provideNewDiscussion(textEditorRef)
+const { draftData, sessionUser, author, initialize } = provideNewDiscussion(textEditorRef)
 
 initialize()
 </script>

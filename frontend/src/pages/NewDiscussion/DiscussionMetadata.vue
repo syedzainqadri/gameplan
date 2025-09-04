@@ -15,8 +15,7 @@
         v-model="draftData.project"
         placeholder="Select Space"
         :class="[author.name !== sessionUser.name ? 'pointer-events-none' : '']"
-        @focus="handleComboboxFocus"
-        @blur="handleComboboxBlur"
+        @change="handleSpaceChange"
       />
     </div>
   </div>
@@ -32,7 +31,6 @@ const {
   sessionUser,
   draftData,
   formattedSpaceOptions,
-  handleComboboxFocus,
-  handleComboboxBlur,
+  handleSpaceChange,
 } = useNewDiscussionContext()
 </script>

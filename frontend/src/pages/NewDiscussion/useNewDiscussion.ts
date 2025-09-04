@@ -1,66 +1,128 @@
-import { computed, onMounted, provide, inject, type InjectionKey } from 'vue'
+import { ref, computed, onMounted, provide, inject, watch, type InjectionKey } from 'vue'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
+import { useLocalStorage } from '@vueuse/core'
+import { useDoc, useNewDoc, useDoctype } from 'frappe-ui/src/data-fetching'
+import { debounce } from 'frappe-ui'
 import { useGroupedSpaceOptions } from '@/data/groupedSpaces'
 import { useSessionUser, useUser } from '@/data/users'
-
-import { useDraftData } from './useDraftData'
-import { useDraftActions } from './useDraftActions'
-import { useUIBehavior } from './useUIBehavior'
-
-import type { TextEditorRef, DraftDocumentCallback } from './types'
+import { tags } from '@/data/tags'
+import { createDialog } from '@/utils/dialogs'
+import type { TextEditorRef, DraftDocumentCallback, DraftDocument, DraftMethods } from './types'
+import type { GPDraft, GPDiscussion } from '@/types/doctypes'
 
 export function useNewDiscussion(textEditorRef?: TextEditorRef) {
+  const currentRoute = useRoute()
+  const router = useRouter()
   const sessionUser = useSessionUser()
+  const discussions = useDoctype<GPDiscussion>('GP Discussion')
+  const draftId = currentRoute.query.draft as string
 
-  const {
-    draftData,
-    draftDoc,
-    errorMessage,
-    validateDraft,
-    isDraftChanged,
-    fetchDraftDoc,
-    updateLocalDraft,
-    resetValues,
-    initializeFromRoute,
-  } = useDraftData()
+  // Core reactive state
+  const getStorageKey = () => (draftId ? `draft_discussion_${draftId}` : 'new_discussion')
 
-  const {
-    publishing,
-    savingDraft,
-    isPublishingSuccessfully,
-    isDeletingDraft,
-    publish,
-    saveDraft,
-    deleteDraft,
-    discard,
-  } = useDraftActions(
-    draftData,
-    draftDoc,
-    validateDraft,
-    resetValues,
-    fetchDraftDoc,
-    errorMessage,
-    textEditorRef,
+  const draftData = useLocalStorage(
+    getStorageKey(),
+    {
+      title: '',
+      content: '',
+      project: null as string | null,
+    },
+    { deep: true },
   )
 
-  const {
-    showFixedMenu,
-    handleTextareaFocus,
-    handleTextareaBlur,
-    handleComboboxFocus,
-    handleComboboxBlur,
-    setupEditorListeners,
-  } = useUIBehavior(
-    isDraftChanged,
-    savingDraft,
-    publishing,
-    isPublishingSuccessfully,
-    isDeletingDraft,
-    saveDraft,
-    resetValues,
-    draftDoc,
-    textEditorRef,
+  const draftDoc = ref<DraftDocument>(null)
+  const errorMessage = ref<string | null>(null)
+  const publishing = ref(false)
+  const isDeletingDraft = ref(false)
+  const isPublishingSuccessfully = ref(false)
+  const hasInteracted = ref(false)
+
+  // Computed values
+  const isDraftChanged = computed(() => {
+    const currentTitle = draftData.value.title
+    const currentContent = draftData.value.content
+    const currentProject = draftData.value.project
+
+    if (draftDoc.value?.doc) {
+      let project = draftDoc.value.doc.project?.toString() || null
+      return (
+        currentTitle !== (draftDoc.value.doc.title || '') ||
+        currentContent !== (draftDoc.value.doc.content || '') ||
+        currentProject !== project
+      )
+    } else {
+      return !!(currentTitle || currentContent || currentProject)
+    }
+  })
+
+  // Auto-save functionality
+  const savingDraft = ref(false)
+
+  const canAutoSave = computed(() => {
+    return draftData.value.title.trim().length > 0 && !savingDraft.value
+  })
+
+  async function _updateDraft() {
+    if (!draftDoc.value?.doc) return
+    await draftDoc.value.setValue.submit({
+      title: draftData.value.title,
+      content: draftData.value.content,
+      project: draftData.value.project || undefined,
+    })
+  }
+
+  async function _createDraft() {
+    const draft = useNewDoc<GPDraft>('GP Draft', {
+      title: draftData.value.title,
+      content: draftData.value.content,
+      project: draftData.value.project || undefined,
+      type: 'Discussion',
+    })
+
+    const doc = await draft.submit()
+    router.replace({ name: 'NewDiscussion', query: { draft: doc.name } })
+    fetchDraftDoc(doc.name)
+  }
+
+  async function performAutoSave() {
+    if (!canAutoSave.value) return
+
+    savingDraft.value = true
+    try {
+      if (draftDoc.value?.doc) {
+        await _updateDraft()
+      } else {
+        await _createDraft()
+      }
+    } catch (error) {
+      console.error('Auto-save failed:', error)
+    } finally {
+      savingDraft.value = false
+    }
+  }
+
+  const debouncedAutoSave = debounce(performAutoSave, 300)
+  const immediateSave = performAutoSave
+
+  // Watch for changes and auto-save
+  watch(
+    () => [draftData.value.title, draftData.value.content, draftData.value.project],
+    () => {
+      if (canAutoSave.value) {
+        debouncedAutoSave()
+      }
+    },
+    { flush: 'post' },
   )
 
+  const saveStatus = computed(() => ({
+    isSaving: savingDraft.value,
+    lastSaved: null,
+    hasUnsavedChanges: isDraftChanged.value,
+    error: null,
+  }))
+
+  // Space options and formatting
   const spaceOptions = useGroupedSpaceOptions({ filterFn: (space) => !space.archived_at })
 
   const formattedSpaceOptions = computed(() => {
@@ -76,13 +138,211 @@ export function useNewDiscussion(textEditorRef?: TextEditorRef) {
     return useUser(draftDoc.value ? draftDoc.value.doc?.owner : sessionUser.name)
   })
 
+  // Core functions
+  function fetchDraftDoc(draftId: string) {
+    draftDoc.value = useDoc<GPDraft, DraftMethods>({
+      doctype: 'GP Draft',
+      name: draftId,
+      methods: {
+        publish: 'publish',
+      },
+    })
+    return draftDoc.value.onSuccess(() => updateLocalDraft())
+  }
+
+  function updateLocalDraft() {
+    if (!draftDoc.value?.doc) return
+    const doc = draftDoc.value.doc
+    draftData.value.title = doc.title || ''
+    draftData.value.content = doc.content || ''
+    draftData.value.project = doc.project ? doc.project.toString() : null
+  }
+
+  function resetValues() {
+    draftData.value.project = null
+    draftData.value.title = ''
+    draftData.value.content = ''
+    localStorage.removeItem(getStorageKey())
+  }
+
+  function initializeFromRoute() {
+    if (!draftId) {
+      draftData.value.title = ''
+      draftData.value.content = ''
+      draftData.value.project = (currentRoute.query.spaceId as string) || null
+    }
+  }
+
+  // Validation
+  const validateDraft = (checkProject = true): boolean => {
+    if (!hasInteracted.value) return true // Don't validate until user has interacted
+
+    errorMessage.value = null
+    if (!draftData.value.title) {
+      errorMessage.value = 'Please enter title.'
+      return false
+    }
+    if (checkProject && !draftData.value.project) {
+      errorMessage.value = 'Please select a space.'
+      return false
+    }
+    return true
+  }
+
+  // Event handlers
   const handleTitleInput = (e: Event) => {
     const target = e.target as HTMLTextAreaElement
     draftData.value.title = target.value
     target.style.height = target.scrollHeight + 'px'
+    hasInteracted.value = true
   }
 
+  const handleTitleBlur = () => {
+    hasInteracted.value = true
+    immediateSave()
+  }
+
+  const handleSpaceChange = () => {
+    hasInteracted.value = true
+    immediateSave()
+  }
+
+  // Publish functionality
+  function publish() {
+    if (!validateDraft(true)) {
+      return
+    }
+    publishing.value = true
+
+    const projectValue = draftData.value.project || undefined
+
+    if (draftDoc.value?.doc) {
+      return draftDoc.value.setValue
+        .submit({
+          title: draftData.value.title,
+          content: draftData.value.content,
+          project: projectValue,
+        })
+        .then(() => {
+          isPublishingSuccessfully.value = true
+          return draftDoc.value?.publish.submit()
+        })
+        .then((discussionId: any) => {
+          if (discussionId) {
+            const spaceId = draftData.value.project
+            resetValues()
+            router
+              .replace({
+                name: 'Discussion',
+                params: {
+                  spaceId: spaceId,
+                  postId: discussionId,
+                },
+              })
+              .finally(() => {
+                isPublishingSuccessfully.value = false
+              })
+            tags.reload()
+          }
+        })
+        .catch(() => {
+          publishing.value = false
+        })
+    }
+
+    return discussions.insert
+      .submit({
+        title: draftData.value.title,
+        content: draftData.value.content,
+        project: projectValue,
+      })
+      .then((doc) => {
+        if (doc) {
+          isPublishingSuccessfully.value = true
+          resetValues()
+          router
+            .replace({
+              name: 'Discussion',
+              params: {
+                spaceId: doc.project,
+                postId: doc.name,
+              },
+            })
+            .finally(() => {
+              isPublishingSuccessfully.value = false
+            })
+        }
+      })
+      .catch(() => {
+        publishing.value = false
+      })
+  }
+
+  function deleteDraft() {
+    createDialog({
+      title: 'Delete draft',
+      message: 'Are you sure you want to delete this draft?',
+      actions: [
+        {
+          label: 'Delete draft',
+          onClick: ({ close }) => {
+            return draftDoc.value?.delete.submit().then(() => {
+              resetValues()
+              isDeletingDraft.value = true
+              close()
+              router.back()
+            })
+          },
+          variant: 'solid',
+        },
+      ],
+    })
+  }
+
+  function discard() {
+    if (!textEditorRef?.value?.editor?.isEmpty || draftData.value.title) {
+      createDialog({
+        title: 'Discard post',
+        message: 'Are you sure you want to discard your post?',
+        actions: [
+          {
+            label: 'Discard post',
+            onClick: ({ close }) => {
+              resetValues()
+              router.back()
+              close()
+            },
+            variant: 'solid',
+          },
+        ],
+      })
+    } else {
+      router.back()
+    }
+  }
+
+  // Editor setup
+  const setupEditorListeners = (editorRef: TextEditorRef) => {
+    setTimeout(() => {
+      const editor = editorRef.value?.editor
+      if (editor) {
+        editor.on('update', () => {
+          // Trigger auto-save when editor content changes
+          debouncedAutoSave()
+        })
+      }
+    }, 100)
+  }
+
+  // Lifecycle management
   function initialize() {
+    // Initialize draft document if we have a draft ID
+    if (draftId) {
+      fetchDraftDoc(draftId)
+    } else {
+      initializeFromRoute()
+    }
+
     onMounted(() => {
       if (draftDoc.value) {
         draftDoc.value.onSuccess((doc: DraftDocumentCallback) => {
@@ -90,12 +350,50 @@ export function useNewDiscussion(textEditorRef?: TextEditorRef) {
             updateLocalDraft()
           }
         })
-      } else {
-        initializeFromRoute()
       }
 
       if (textEditorRef) {
         setupEditorListeners(textEditorRef)
+      }
+    })
+
+    // Navigation guard
+    onBeforeRouteLeave((_, __, next) => {
+      if (isDeletingDraft.value || isPublishingSuccessfully.value || publishing.value) {
+        next()
+        return
+      }
+      if (isDraftChanged.value) {
+        createDialog({
+          title: 'Unsaved Changes',
+          message: 'You have unsaved changes. Do you want to save them before leaving?',
+          actions: [
+            {
+              label: 'Discard',
+              variant: 'subtle',
+              onClick: ({ close }) => {
+                resetValues()
+                close()
+                next()
+              },
+            },
+            {
+              label: 'Save Draft',
+              variant: 'solid',
+              onClick: async ({ close }) => {
+                try {
+                  immediateSave()
+                  close()
+                  next()
+                } catch (e) {
+                  console.error('Failed to save draft before leaving:', e)
+                }
+              },
+            },
+          ],
+        })
+      } else {
+        next()
       }
     })
   }
@@ -112,21 +410,18 @@ export function useNewDiscussion(textEditorRef?: TextEditorRef) {
     // State
     isDraftChanged,
     publishing,
-    savingDraft,
     isPublishingSuccessfully,
     isDeletingDraft,
-    showFixedMenu,
+    saveStatus,
 
     // Actions
     publish,
-    saveDraft,
     deleteDraft,
     discard,
     handleTitleInput,
-    handleTextareaFocus,
-    handleTextareaBlur,
-    handleComboboxFocus,
-    handleComboboxBlur,
+    handleTitleBlur,
+    handleSpaceChange,
+    immediateSave,
 
     // Lifecycle
     initialize,

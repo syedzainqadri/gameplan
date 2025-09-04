@@ -43,6 +43,11 @@ let router = createRouter({
       props: true,
     },
     {
+      name: 'Drafts',
+      path: '/drafts',
+      component: () => import('@/pages/Drafts.vue'),
+    },
+    {
       name: 'MyTasks',
       path: '/tasks',
       component: () => import('@/pages/MyTasks.vue'),

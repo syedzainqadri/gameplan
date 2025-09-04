@@ -17,6 +17,7 @@
   {
    "fieldname": "content",
    "fieldtype": "Text Editor",
+   "ignore_xss_filter": 1,
    "in_list_view": 1,
    "label": "Content",
    "reqd": 1
@@ -54,8 +55,8 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-22 13:12:51.415148",
- "modified_by": "Administrator",
+ "modified": "2025-08-31 23:29:54.697656",
+ "modified_by": "faris@erpnext.com",
  "module": "Gameplan",
  "name": "GP Comment",
  "naming_rule": "Autoincrement",

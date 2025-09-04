@@ -22,7 +22,7 @@ export let activeTeams = computed(() => {
   return (teams.data || []).filter((team) => !team.archived_at)
 })
 
-export let useTeam = (teamId?: MaybeRefOrGetter<string>) => {
+export let useTeam = (teamId: MaybeRefOrGetter<string | undefined>) => {
   return computed(() => {
     let _teamId = toValue(teamId)
     if (!_teamId) {

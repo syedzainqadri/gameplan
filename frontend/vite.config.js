@@ -78,6 +78,24 @@ export default defineConfig(async ({ mode }) => {
       const localFrappeUIPath = path.resolve(__dirname, '../frappe-ui')
       if (fs.existsSync(localFrappeUIPath)) {
         config.resolve.alias['frappe-ui'] = localFrappeUIPath
+
+        // Dynamically resolve TipTap packages to avoid error: Adding different instances of a keyed plugin
+        const gameplanNodeModules = path.resolve(__dirname, 'node_modules/@tiptap')
+        const frappeUINodeModules = path.resolve(localFrappeUIPath, 'node_modules/@tiptap')
+
+        const gameplanTiptapPackages = fs.readdirSync(gameplanNodeModules)
+        const frappeUITiptapPackages = fs.readdirSync(frappeUINodeModules)
+
+        // Find packages that exist in both locations
+        const commonTiptapPackages = gameplanTiptapPackages.filter((pkg) =>
+          frappeUITiptapPackages.includes(pkg),
+        )
+
+        // Alias common packages to gameplan's node_modules to ensure single instance
+        commonTiptapPackages.forEach((pkg) => {
+          const packageName = `@tiptap/${pkg}`
+          config.resolve.alias[packageName] = path.resolve(__dirname, 'node_modules', packageName)
+        })
       } else {
         console.warn('Local frappe-ui directory not found, using npm package')
       }

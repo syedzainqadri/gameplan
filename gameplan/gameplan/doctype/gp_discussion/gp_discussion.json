@@ -38,6 +38,7 @@
   {
    "fieldname": "content",
    "fieldtype": "Text Editor",
+   "ignore_xss_filter": 1,
    "label": "Content",
    "read_only": 1
   },
@@ -140,7 +141,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-19 23:59:43.143194",
+ "modified": "2025-08-31 19:13:17.867939",
  "modified_by": "faris@erpnext.com",
  "module": "Gameplan",
  "name": "GP Discussion",

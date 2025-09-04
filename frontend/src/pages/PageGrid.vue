@@ -1,9 +1,13 @@
 <template>
-  <div>
-    <EmptyStateBox class="col-span-4" v-if="pages.data?.length === 0">
-      <LucideCoffee class="h-7 w-7 text-ink-gray-4" />
-      No pages
-    </EmptyStateBox>
+  <div v-if="pages.data?.length === 0">
+    <div class="col-span-full">
+      <EmptyStateBox class="max-w-4xl mx-auto">
+        <LucideCoffee class="h-7 w-7 text-ink-gray-4" />
+        No pages
+      </EmptyStateBox>
+    </div>
+  </div>
+  <div v-else>
     <div class="relative" v-for="d in pages.data" :key="d.name">
       <router-link
         :to="{

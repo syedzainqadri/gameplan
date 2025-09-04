@@ -107,7 +107,7 @@ import {
   type Component,
 } from 'vue'
 import { RouteLocationRaw, useRouter } from 'vue-router'
-import { debounce } from 'frappe-ui'
+import { dayjs, debounce } from 'frappe-ui'
 import { useCall, useNewDoc } from 'frappe-ui/src/data-fetching'
 import fuzzysort from 'fuzzysort'
 import { activeUsers, useUser } from '@/data/users'
@@ -160,19 +160,19 @@ interface SearchResultItem {
   reference_doctype?: string
   reference_name?: string
   score: number
-  timestamp: number
+  modified: number
   title: string
 }
 
 interface CommandPaletteItem extends Partial<SearchResultItem> {
   title: string
+  search?: string
   name: string
   doctype?: string
   route?: RouteLocationRaw
   isActive?: boolean
   group?: string
   type?: string
-  modified?: string
   icon?: Component
   onClick?: () => void
   condition?: () => boolean | undefined
@@ -198,7 +198,7 @@ const transformedSearchResults = computed(() => {
   return titleSearch.data.map((group) => ({
     title: group.title,
     items: group.items.map((item) => {
-      const baseItem: CommandPaletteItem = { ...item }
+      const baseItem: CommandPaletteItem = { ...item, modified: dayjs.unix(item.modified) }
 
       if (group.title === 'Discussions') {
         baseItem.route = {
@@ -285,6 +285,7 @@ const shortcuts = computed((): CommandPaletteGroup[] => [
       {
         title: 'Add Discussion',
         name: 'add-discussion',
+        search: 'Add Discussion New Discussion',
         icon: () => h(LucideMessageSquarePlus),
         onClick() {
           let spaceId = router.currentRoute.value.params?.spaceId ?? null
@@ -294,6 +295,7 @@ const shortcuts = computed((): CommandPaletteGroup[] => [
       {
         title: 'Add Task',
         name: 'add-task',
+        search: 'Add Task New Task',
         icon: () => h(LucideSquarePlus),
         onClick() {
           let spaceId = router.currentRoute.value?.params?.spaceId ?? null
@@ -318,6 +320,7 @@ const shortcuts = computed((): CommandPaletteGroup[] => [
       {
         title: 'Add Page',
         name: 'add-page',
+        search: 'Add Page New Page',
         icon: () => h(LucideFilePlus),
         onClick() {
           let spaceId = router.currentRoute.value.params?.spaceId ?? null
@@ -369,7 +372,7 @@ function generateSearchResults() {
     .map((group) => ({
       ...group,
       items: group.items.filter((item: CommandPaletteItem) =>
-        item.title.toLowerCase().includes(query.value.toLowerCase()),
+        (item.search || item.title).toLowerCase().includes(query.value.toLowerCase()),
       ),
     }))
     .filter((group) => group.items.length > 0)
@@ -423,7 +426,7 @@ const searchList = computed(() => {
       doctype: 'GP Project',
       name: project.name,
       title: project.title,
-      modified: project.modified,
+      search: `${project.title} ${project.team}`,
       route: {
         name: 'Space',
         params: { spaceId: project.name },
@@ -438,7 +441,7 @@ const searchList = computed(() => {
       doctype: 'GP User Profile',
       name: user.name,
       title: user.full_name,
-      //   modified: user.modified,
+      search: `${user.full_name} ${user.email}`,
       icon: () => h(UserAvatar, { user: user.email, size: 'sm' }),
       route: {
         name: 'PersonProfile',
@@ -454,7 +457,7 @@ function onInput(e: Event) {
   if (query.value) {
     let results = fuzzysort
       .go(query.value, searchList.value, {
-        key: 'title',
+        key: 'search',
         limit: 100,
         threshold: -10000,
       })

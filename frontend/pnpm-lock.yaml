@@ -15,14 +15,14 @@ importers:
         specifier: ^8.37.1
         version: 8.55.0(vue@3.5.13(typescript@5.8.3))
       '@tiptap/core':
-        specifier: ^2.12.0
+        specifier: ^2.26.1
         version: 2.26.1(@tiptap/pm@2.26.1)
       '@tiptap/pm':
-        specifier: ^2.12.0
+        specifier: ^2.26.1
         version: 2.26.1
       '@tiptap/vue-3':
-        specifier: ^2.11.7
-        version: 2.12.0(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)(vue@3.5.13(typescript@5.8.3))
+        specifier: ^2.26.1
+        version: 2.26.1(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)(vue@3.5.13(typescript@5.8.3))
       '@vueuse/core':
         specifier: ^10.1.2
         version: 10.11.1(vue@3.5.13(typescript@5.8.3))
@@ -30,8 +30,8 @@ importers:
         specifier: ^4.28.0
         version: 4.29.2
       frappe-ui:
-        specifier: ^0.1.191
-        version: 0.1.191(@babel/parser@7.27.2)(@vue/compiler-sfc@3.5.13)(tailwindcss@3.4.17)(vue-router@4.5.1(vue@3.5.13(typescript@5.8.3)))(vue-template-compiler@2.7.16)(vue@3.5.13(typescript@5.8.3))
+        specifier: ^0.1.195
+        version: 0.1.195(@babel/parser@7.27.2)(@vue/compiler-sfc@3.5.13)(tailwindcss@3.4.17)(vue-router@4.5.1(vue@3.5.13(typescript@5.8.3)))(vue-template-compiler@2.7.16)(vue@3.5.13(typescript@5.8.3))
       fuzzysort:
         specifier: ^2.0.4
         version: 2.0.4
@@ -607,6 +607,11 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1 || >= 4.0.0-alpha.20 || >= 4.0.0-beta.1'
 
+  '@tailwindcss/line-clamp@0.4.4':
+    resolution: {integrity: sha512-5U6SY5z8N42VtrCrKlsTAA35gy2VSyYtHWCsg1H87NU1SXnEfekTVlrga9fzUDrrHcGi2Lb5KenUWb4lRQT5/g==}
+    peerDependencies:
+      tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
+
   '@tailwindcss/typography@0.5.16':
     resolution: {integrity: sha512-0wDLwCVF5V3x3b1SGXPCDcdsbDHMBe+lkFzBRaHeLvNi+nrrnZ1lA18u+OTWO8iSWU2GxUOCvlXtDuqftc1oiA==}
     peerDependencies:
@@ -634,12 +639,6 @@ packages:
     resolution: {integrity: sha512-zCce9PRuTNhadFir71luLo99HERDpGJ0EEflGm7RN8I1SnNi9gD5ooK42BOIQtejGCJqg3hTPZiYDJC2hXvckQ==}
     peerDependencies:
       '@tiptap/core': ^2.7.0
-
-  '@tiptap/extension-bubble-menu@2.12.0':
-    resolution: {integrity: sha512-DYijoE0igV0Oi+ZppFsp2UrQsM/4HZtmmpD78BJM9zfCbd1YvAUIxmzmXr8uqU18OHd1uQy+/zvuNoUNYyw67g==}
-    peerDependencies:
-      '@tiptap/core': ^2.7.0
-      '@tiptap/pm': ^2.7.0
 
   '@tiptap/extension-bubble-menu@2.26.1':
     resolution: {integrity: sha512-oHevUcZbTMFOTpdCEo4YEDe044MB4P1ZrWyML8CGe5tnnKdlI9BN03AXpI1mEEa5CA3H1/eEckXx8EiCgYwQ3Q==}
@@ -685,12 +684,6 @@ packages:
 
   '@tiptap/extension-dropcursor@2.26.1':
     resolution: {integrity: sha512-JkDQU2ZYFOuT5mNYb8OiWGwD1HcjbtmX8tLNugQbToECmz9WvVPqJmn7V/q8VGpP81iEECz/IsyRmuf2kSD4uA==}
-    peerDependencies:
-      '@tiptap/core': ^2.7.0
-      '@tiptap/pm': ^2.7.0
-
-  '@tiptap/extension-floating-menu@2.12.0':
-    resolution: {integrity: sha512-BYpyZx/56KCDksWuJJbhki/uNgt9sACuSSZFH5AN1yS1ISD+EzIxqf6Pzzv8QCoNJ+KcRNVaZsOlOFaJGoyzag==}
     peerDependencies:
       '@tiptap/core': ^2.7.0
       '@tiptap/pm': ^2.7.0
@@ -846,13 +839,6 @@ packages:
     peerDependencies:
       '@tiptap/core': ^2.7.0
       '@tiptap/pm': ^2.7.0
-
-  '@tiptap/vue-3@2.12.0':
-    resolution: {integrity: sha512-NXvxIwBSYDhEiL6MwRnoUc5+KizAnokp4/BA3n4S5+hbmpuJCygebYdq8Tap0KU9caAh53qqiMlSonuLHny5vA==}
-    peerDependencies:
-      '@tiptap/core': ^2.7.0
-      '@tiptap/pm': ^2.7.0
-      vue: ^3.0.0
 
   '@tiptap/vue-3@2.26.1':
     resolution: {integrity: sha512-GC0UP+v3KEb0nhgjIHYmWIn5ziTaRqSy8TESXOjG5aljJ8BdP+A0pbcpumB3u0QU+BLUANZqUV2r3l+V18AKYg==}
@@ -1470,8 +1456,8 @@ packages:
   fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
 
-  frappe-ui@0.1.191:
-    resolution: {integrity: sha512-Esx15VGpT5qleNz2SLeOqfvzzhuiU1fEjO8LSN0mTi+zHOud2kIKquQup1bs/iy8euBLtkuk1up5PftFtlWO0Q==}
+  frappe-ui@0.1.195:
+    resolution: {integrity: sha512-9zakR9+mbrkSC83SkXIE9h6+OIjUb05AoZC76M17AZ3W3oQg6HkvEr13uF1F2Yr6Xq1SxKGqPYX9H1PE23QttQ==}
     peerDependencies:
       vue: '>=3.5.0'
       vue-router: ^4.1.6
@@ -2181,6 +2167,11 @@ packages:
 
   reka-ui@2.2.1:
     resolution: {integrity: sha512-oLHiyBn6gTIQGnTnv8G5LQuFp9j8HuUNl0qdnW3XPhFb/07hrxzFpjo2kt/jxOZive+n/XWDbOjSj2h9Hih3qA==}
+    peerDependencies:
+      vue: '>= 3.2.0'
+
+  reka-ui@2.5.0:
+    resolution: {integrity: sha512-81aMAmJeVCy2k0E6x7n1kypDY6aM1ldLis5+zcdV1/JtoAlSDck5OBsyLRJU9CfgbrQp1ImnRnBSmC4fZ2fkZQ==}
     peerDependencies:
       vue: '>= 3.2.0'
 
@@ -3155,6 +3146,10 @@ snapshots:
       mini-svg-data-uri: 1.4.4
       tailwindcss: 3.4.17
 
+  '@tailwindcss/line-clamp@0.4.4(tailwindcss@3.4.17)':
+    dependencies:
+      tailwindcss: 3.4.17
+
   '@tailwindcss/typography@0.5.16(tailwindcss@3.4.17)':
     dependencies:
       lodash.castarray: 4.4.0
@@ -3181,12 +3176,6 @@ snapshots:
   '@tiptap/extension-bold@2.26.1(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))':
     dependencies:
       '@tiptap/core': 2.26.1(@tiptap/pm@2.26.1)
-
-  '@tiptap/extension-bubble-menu@2.12.0(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)':
-    dependencies:
-      '@tiptap/core': 2.26.1(@tiptap/pm@2.26.1)
-      '@tiptap/pm': 2.26.1
-      tippy.js: 6.3.7
 
   '@tiptap/extension-bubble-menu@2.26.1(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)':
     dependencies:
@@ -3228,12 +3217,6 @@ snapshots:
     dependencies:
       '@tiptap/core': 2.26.1(@tiptap/pm@2.26.1)
       '@tiptap/pm': 2.26.1
-
-  '@tiptap/extension-floating-menu@2.12.0(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)':
-    dependencies:
-      '@tiptap/core': 2.26.1(@tiptap/pm@2.26.1)
-      '@tiptap/pm': 2.26.1
-      tippy.js: 6.3.7
 
   '@tiptap/extension-floating-menu@2.26.1(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)':
     dependencies:
@@ -3400,14 +3383,6 @@ snapshots:
     dependencies:
       '@tiptap/core': 2.26.1(@tiptap/pm@2.26.1)
       '@tiptap/pm': 2.26.1
-
-  '@tiptap/vue-3@2.12.0(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)(vue@3.5.13(typescript@5.8.3))':
-    dependencies:
-      '@tiptap/core': 2.26.1(@tiptap/pm@2.26.1)
-      '@tiptap/extension-bubble-menu': 2.12.0(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)
-      '@tiptap/extension-floating-menu': 2.12.0(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)
-      '@tiptap/pm': 2.26.1
-      vue: 3.5.13(typescript@5.8.3)
 
   '@tiptap/vue-3@2.26.1(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)(vue@3.5.13(typescript@5.8.3))':
     dependencies:
@@ -4104,12 +4079,13 @@ snapshots:
 
   fraction.js@4.3.7: {}
 
-  frappe-ui@0.1.191(@babel/parser@7.27.2)(@vue/compiler-sfc@3.5.13)(tailwindcss@3.4.17)(vue-router@4.5.1(vue@3.5.13(typescript@5.8.3)))(vue-template-compiler@2.7.16)(vue@3.5.13(typescript@5.8.3)):
+  frappe-ui@0.1.195(@babel/parser@7.27.2)(@vue/compiler-sfc@3.5.13)(tailwindcss@3.4.17)(vue-router@4.5.1(vue@3.5.13(typescript@5.8.3)))(vue-template-compiler@2.7.16)(vue@3.5.13(typescript@5.8.3)):
     dependencies:
       '@floating-ui/vue': 1.1.6(vue@3.5.13(typescript@5.8.3))
       '@headlessui/vue': 1.7.23(vue@3.5.13(typescript@5.8.3))
       '@popperjs/core': 2.11.8
       '@tailwindcss/forms': 0.5.10(tailwindcss@3.4.17)
+      '@tailwindcss/line-clamp': 0.4.4(tailwindcss@3.4.17)
       '@tailwindcss/typography': 0.5.16(tailwindcss@3.4.17)
       '@tiptap/core': 2.26.1(@tiptap/pm@2.26.1)
       '@tiptap/extension-code-block': 2.26.1(@tiptap/core@2.26.1(@tiptap/pm@2.26.1))(@tiptap/pm@2.26.1)
@@ -4148,7 +4124,7 @@ snapshots:
       ora: 5.4.1
       prettier: 3.5.3
       radix-vue: 1.9.17(vue@3.5.13(typescript@5.8.3))
-      reka-ui: 2.2.1(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
+      reka-ui: 2.5.0(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
       socket.io-client: 4.8.1
       tippy.js: 6.3.7
       typescript: 5.8.3
@@ -4816,6 +4792,23 @@ snapshots:
       picomatch: 2.3.1
 
   reka-ui@2.2.1(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)):
+    dependencies:
+      '@floating-ui/dom': 1.7.0
+      '@floating-ui/vue': 1.1.6(vue@3.5.13(typescript@5.8.3))
+      '@internationalized/date': 3.8.0
+      '@internationalized/number': 3.6.1
+      '@tanstack/vue-virtual': 3.13.8(vue@3.5.13(typescript@5.8.3))
+      '@vueuse/core': 12.8.2(typescript@5.8.3)
+      '@vueuse/shared': 12.8.2(typescript@5.8.3)
+      aria-hidden: 1.2.4
+      defu: 6.1.4
+      ohash: 2.0.11
+      vue: 3.5.13(typescript@5.8.3)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - typescript
+
+  reka-ui@2.5.0(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3)):
     dependencies:
       '@floating-ui/dom': 1.7.0
       '@floating-ui/vue': 1.1.6(vue@3.5.13(typescript@5.8.3))

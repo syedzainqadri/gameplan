@@ -77,7 +77,7 @@ class GPDiscussion(HasActivity, HasMentions, HasReactions, HasTags, Document):
 		GPUnreadRecord.delete_unread_records_for_discussion(self.name)
 
 	def validate(self):
-		self.content = remove_empty_trailing_paragraphs(self.content)
+		self.sanitize_content()
 		self.title = self.title.strip()
 		self.de_duplicate_reactions()
 
@@ -90,6 +90,13 @@ class GPDiscussion(HasActivity, HasMentions, HasReactions, HasTags, Document):
 	def before_save(self):
 		self.update_slug()
 		self.update_tags()
+		self.sanitize_content()
+
+	def sanitize_content(self):
+		from gameplan.utils.sanitizer import sanitize_content
+
+		self.content = remove_empty_trailing_paragraphs(self.content)
+		self.content = sanitize_content(self.content)
 
 	# Whitelisted Methods
 	@frappe.whitelist()

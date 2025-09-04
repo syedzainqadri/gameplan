@@ -191,6 +191,7 @@ import LucideCheck from '~icons/lucide/check'
 import LucideUnfoldVertical from '~icons/lucide/unfold-vertical'
 import LucideFoldVertical from '~icons/lucide/fold-vertical'
 import LucideMoreHorizontal from '~icons/lucide/more-horizontal'
+import LucidePencilLine from '~icons/lucide/pencil-line'
 
 const showAddTeamDialog = ref(false)
 const showHomePageSettingsDialog = ref(false)
@@ -266,6 +267,14 @@ const navigation = computed(() => {
       },
       count: unreadNotifications.data || 0,
       isActive: testRoute(/Notifications/g),
+    },
+    {
+      name: 'Drafts',
+      icon: LucidePencilLine,
+      route: {
+        name: 'Drafts',
+      },
+      isActive: testRoute(/Drafts/g),
     },
     {
       name: 'Tasks',

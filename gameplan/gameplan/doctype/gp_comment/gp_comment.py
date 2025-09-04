@@ -58,8 +58,14 @@ class GPComment(HasMentions, HasReactions, HasTags, Document):
 		frappe.get_doc("GP Task", self.reference_name).update_comments_count()
 
 	def validate(self):
-		self.content = remove_empty_trailing_paragraphs(self.content)
+		self.sanitize_content()
 		self.de_duplicate_reactions()
+
+	def sanitize_content(self):
+		from gameplan.utils.sanitizer import sanitize_content
+
+		self.content = remove_empty_trailing_paragraphs(self.content)
+		self.content = sanitize_content(self.content)
 
 	def on_update(self):
 		self.notify_mentions()

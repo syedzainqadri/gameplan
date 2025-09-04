@@ -28,14 +28,14 @@ export let users = useCall<UserInfo[]>({
   url: '/api/v2/method/gameplan.api.get_user_info',
   cacheKey: 'Users',
   initialData: [],
-  transform(users) {
-    for (let user of users) {
+  transform(data) {
+    for (let user of data) {
       user.isGuest = user.role === 'Gameplan Guest'
       user.isNotGuest = !user.isGuest
       user.isDisabled = user.enabled === 0
       usersByName[user.name] = user
     }
-    return users
+    return data
   },
   onError(error) {
     if (error && error.type === 'AuthenticationError') {

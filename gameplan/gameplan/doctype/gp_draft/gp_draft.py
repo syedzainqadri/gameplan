@@ -8,6 +8,11 @@ from frappe.model.document import Document
 
 
 class GPDraft(Document):
+	def before_save(self):
+		from gameplan.utils.sanitizer import sanitize_content
+
+		self.content = sanitize_content(self.content)
+
 	@staticmethod
 	def get_list(query):
 		GPDraft = frappe.qb.DocType("GP Draft")
